@@ -14,7 +14,32 @@ export const createLocationValidator = Joi.object<CreateLocationApi.Data, true>(
         type: Joi.string()
             .valid(...Object.values(SHAPE_TYPES))
             .required(),
-        coordinates: Joi.array().required(),
+        coordinates: Joi.array()
+            .required()
+            .when("type", {
+                is: SHAPE_TYPES.POINT,
+                then: Joi.array().length(2).items(Joi.number()).required(),
+                otherwise: Joi.invalid(),
+            })
+            .when("type", {
+                is: SHAPE_TYPES.MULTI_POINT,
+                then: Joi.array().items(Joi.array().length(2).items(Joi.number())).required(),
+                otherwise: Joi.invalid(),
+            })
+            .when("type", {
+                is: SHAPE_TYPES.POLYGON,
+                then: Joi.array()
+                    .items(Joi.array().min(4).items(Joi.array().length(2).items(Joi.number())))
+                    .required(),
+                otherwise: Joi.invalid(),
+            })
+            .when("type", {
+                is: SHAPE_TYPES.MULTI_POLYGON,
+                then: Joi.array()
+                    .items(Joi.array().items(Joi.array().items(Joi.array().length(2).items(Joi.number()))))
+                    .required(),
+                otherwise: Joi.invalid(),
+            }),
     }),
 });
 
