@@ -2,7 +2,11 @@ import { Response } from "express";
 import { LocationService } from "../services";
 import { bind, Controller, Validator } from "../utils/decorators";
 import { CreateLocationApi, GetLocationApi, UpdateLocationApi } from "../types/location";
-import { createLocationValidator, getLocationByIdValidator } from "../validations/locations.validations";
+import {
+    createLocationValidator,
+    getLocationByIdValidator,
+    updateLocationValidator,
+} from "../validations/locations.validations";
 
 @bind
 export class LocationController {
@@ -21,6 +25,7 @@ export class LocationController {
     }
 
     @Controller
+    @Validator(updateLocationValidator)
     async updateLocation(req: UpdateLocationApi.Request) {
         return await this.service.updateLocation(req.params.id, req.body);
     }
